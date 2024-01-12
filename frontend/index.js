@@ -6,7 +6,7 @@ function viewimage() {
     document.getElementById("heading").innerText = "You got:";
     document.getElementById("reset-btn").style.display = "inline";
     document.getElementById("view-btn").style.display = "none";
-
+    document.getElementById("tagline").style.display = "block";
 };
 
 function reset() {
@@ -25,6 +25,7 @@ function reset() {
 
             document.getElementById("image-box").style.display = "none";
             document.getElementById("qr-box").style.display = "block";
+            document.getElementById("tagline").style.display = "none";
 
             document.getElementById("heading").innerText = "Scan QR:";
             document.getElementById("reset-btn").style.display = "none";
