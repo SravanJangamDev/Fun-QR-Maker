@@ -25,37 +25,64 @@ def generate_qr_code(image):
 tasks = [
     {
         "taskid": "1",
-        "image": "",
-        "tagline": ""
-    }
+        "image": "smiley.png",
+        "tagline": "Share the best memory you have with your manager.",
+    },
+    {
+        "taskid": "2",
+        "image": "smiley.png",
+        "tagline": "Share a funny or interesting fact about yourself that most people don't know.",
+    },
+    {
+        "taskid": "3",
+        "image": "smiley.png",
+        "tagline": "What positive feelings you have about HR, and describe them.",
+    },
 ]
 
 images = os.listdir(f"{FRONTEND_PATH}/images")
 app = Flask(__name__)
 
 generate_qr_code(f"{FRONTEND_BASE_URL}/display.html")
-selected_image = ""
+selected_task: dict = {}
 
-@app.route("/qrcode", methods=['GET'])
+
+@app.route("/qrcode", methods=["GET"])
 def generate_qr():
-    global selected_image
-    image = images[randint(0, len(images) - 1)]
-    selected_image = image
+    global selected_task
+    task = tasks[randint(0, len(tasks) - 1)]
+    image = task.get("image", "")
+    tagline = task.get("tagline", "")
+    selected_task = task
     response = app.response_class(
-        response=json.dumps({"image_url": f"{FRONTEND_BASE_URL}/images/{image}" , "qr_url": f"{FRONTEND_BASE_URL}/qrcode.png"}),
+        response=json.dumps(
+            {
+                "image_url": f"{FRONTEND_BASE_URL}/images/{image}",
+                "qr_url": f"{FRONTEND_BASE_URL}/qrcode.png",
+                "tagline": tagline,
+            }
+        ),
         status=200,
-        mimetype='application/json'
+        mimetype="application/json",
     )
     return response
 
 
-@app.route("/qrcode/selected", methods=['GET'])
+@app.route("/qrcode/selected", methods=["GET"])
 def get_selected():
-    global selected_image
+    global selected_task
+    image = selected_task.get("image", "")
+    tagline = selected_task.get("tagline", "")
+
     response = app.response_class(
-        response=json.dumps({"image_url": f"{FRONTEND_BASE_URL}/images/{selected_image}" }),
+        response=json.dumps(
+            {
+                "image_url": f"{FRONTEND_BASE_URL}/images/{image}",
+                "tagline": tagline,
+            }
+        ),
         status=200,
-        mimetype='application/json'
+        mimetype="application/json",
     )
     return response
 
@@ -71,4 +98,4 @@ def get_selected():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host='127.0.0.1', port=8600)
+    app.run(debug=True, host="127.0.0.1", port=8600)

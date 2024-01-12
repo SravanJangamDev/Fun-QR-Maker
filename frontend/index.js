@@ -21,6 +21,7 @@ function reset() {
             console.log(data);
             document.getElementById("display-image").src = data.image_url;
             document.getElementById("display-qr").src = data.qr_url;
+            document.getElementById("tagline").innerText = data.tagline;
 
             document.getElementById("image-box").style.display = "none";
             document.getElementById("qr-box").style.display = "block";
@@ -42,6 +43,7 @@ function display() {
         .then(data => {
             console.log(data);
             document.getElementById("display-image").src = data.image_url;
+            document.getElementById("tagline").innerText = data.tagline;
         })
         .catch(error => console.error('Error:', error));
 }
