@@ -2,8 +2,9 @@ from flask import Flask, render_template, send_from_directory
 import qrcode
 import os
 from random import randint
+import json
 
-from config import BASEURL
+from config import BASEURL, FRONTEND_PATH, FRONTEND_BASE_URL
 
 qr = qrcode.QRCode(
     version=1,
@@ -13,42 +14,61 @@ qr = qrcode.QRCode(
 )
 
 
-def generate_qr_code(image, filename):
-    url = f"{BASEURL}/{image}"
-    qr.add_data(url)
+def generate_qr_code(image):
+    qr.add_data(image)
     qr.make(fit=True)
 
     img = qr.make_image(fill_color="black", back_color="white")
-    img.save(f"qrcodes/{filename}")
-
-    return f"qrcodes/{filename}"
+    img.save(f"{FRONTEND_PATH}/qrcode.png")
 
 
-images = os.listdir("images")
-images = [f"images/{img}" for img in images]
+tasks = [
+    {
+        "taskid": "1",
+        "image": "",
+        "tagline": ""
+    }
+]
 
+images = os.listdir(f"{FRONTEND_PATH}/images")
 app = Flask(__name__)
 
+generate_qr_code(f"{FRONTEND_BASE_URL}/display.html")
+selected_image = ""
 
-@app.route("/")
-def index():
+@app.route("/qrcode", methods=['GET'])
+def generate_qr():
+    global selected_image
     image = images[randint(0, len(images) - 1)]
-    qr_url = generate_qr_code(image, "qrcode.png")
-
-    return render_template(
-        "index.html", qr_url=qr_url, image_url=image, heading="Scan QR"
+    selected_image = image
+    response = app.response_class(
+        response=json.dumps({"image_url": f"{FRONTEND_BASE_URL}/images/{image}" , "qr_url": f"{FRONTEND_BASE_URL}/qrcode.png"}),
+        status=200,
+        mimetype='application/json'
     )
+    return response
 
 
-@app.route("/images/<filename>")
-def show_image(filename):
-    return send_from_directory("images", filename)
+@app.route("/qrcode/selected", methods=['GET'])
+def get_selected():
+    global selected_image
+    response = app.response_class(
+        response=json.dumps({"image_url": f"{FRONTEND_BASE_URL}/images/{selected_image}" }),
+        status=200,
+        mimetype='application/json'
+    )
+    return response
 
 
-@app.route("/qrcodes/<filename>")
-def show_qrcode(filename):
-    return send_from_directory("images", filename)
+# @app.route("/qrcode/images/<filename>")
+# def show_image(filename):
+#     return send_from_directory("images", filename)
+
+
+# @app.route("/qrcode/qrcodes/<filename>")
+# def show_qrcode(filename):
+#     return send_from_directory("images", filename)
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host='127.0.0.1', port=8600)

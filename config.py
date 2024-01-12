@@ -1,1 +1,4 @@
-BASEURL = "http://127.0.0.1"
+BASEURL = "https://app.loan2wheels.com/qrcode"
+FRONTEND_BASE_URL = "https://app.loan2wheels.com/frontend"
+
+FRONTEND_PATH = "/home/ubuntu/LOS/Fun-QR-Maker/frontend"
